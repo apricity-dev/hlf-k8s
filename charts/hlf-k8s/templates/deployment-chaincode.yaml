@@ -23,6 +23,7 @@ spec:
         app.kubernetes.io/name: {{ template "substra.name" $ }}-chaincode-{{ .name }}
         app.kubernetes.io/instance: {{ $.Release.Name }}
     spec:
+      serviceAccountName: {{ template "substra.fullname" $ }}
       containers:
         - name: substra-chaincode-{{ .name }}
           image: {{ .image.repository }}:{{ .image.tag }}

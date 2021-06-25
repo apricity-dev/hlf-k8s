@@ -12,16 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+apricityAws:
+  enabled: true
+  createSecret: true
+  imagePullSecret: aws-token
+  configs:
+    AWS_DEFAULT_REGION: eu-west-1
+    ECR_REPOSITORY_URL: 220471932914.dkr.ecr.eu-west-1.amazonaws.com
+#    AWS_SECRET_ACCESS_KEY: ~
+#    AWS_ACCESS_KEY_ID: ~
+
 fabric-tools:
   image:
-    repository: substrafoundation/fabric-tools
-    tag: latest
+    repository: 220471932914.dkr.ecr.eu-west-1.amazonaws.com/fabric-tools
+    tag: 0.0.16
     pullPolicy: IfNotPresent
 
 fabric-ca-tools:
   image:
-    repository: substrafoundation/fabric-ca-tools
-    tag: latest
+    repository: 220471932914.dkr.ecr.eu-west-1.amazonaws.com/fabric-ca-tools
+    tag: 0.0.16
     pullPolicy: IfNotPresent
 
 nginx-ingress:
@@ -61,7 +71,7 @@ chaincodes: []
 #   address: "chaincode-org-0-substra-chaincode-chaincode.org-0"
 #   port: "7052"
 #   image:
-#     repository: substrafoundation/substra-chaincode
+#     repository: 220471932914.dkr.ecr.eu-west-1.amazonaws.com/substra-chaincode
 #     tag: 0.1.1
 #     pullPolicy: IfNotPresent
 
@@ -206,8 +216,8 @@ hlf-peer:
   port: 7051
   image:
     # Use our own fabric-peer images with external chaincode binaries
-    repository: substrafoundation/fabric-peer
-    tag: latest
+    repository: 220471932914.dkr.ecr.eu-west-1.amazonaws.com/fabric-peer
+    tag: 0.0.16
   persistence:
     enabled: false
   discover-monitor:

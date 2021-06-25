@@ -1,0 +1,140 @@
+{{- if and .Values.apricityAws.enabled .Values.apricityAws.createSecret }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: aws-token-updater
+spec:
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          serviceAccountName: aws-serviceaccount
+          containers:
+            - name: aws-update-token
+              image: odaniait/aws-kubectl:latest
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -c
+                - |-
+                  TOKEN=`aws ecr get-login-password`
+                  kubectl delete secret --ignore-not-found $SECRET_NAME
+                  kubectl create secret docker-registry $SECRET_NAME \
+                  --docker-server=https://${ECR_REPOSITORY_URL} \
+                  --docker-username=AWS \
+                  --docker-password=${TOKEN}
+                  echo "all done"
+              env:
+                - name: AWS_DEFAULT_REGION
+                  valueFrom:
+                    configMapKeyRef:
+                      name: aws-configmap
+                      key: AWS_DEFAULT_REGION
+                - name: ECR_REPOSITORY_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: aws-configmap
+                      key: ECR_REPOSITORY_URL
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: aws-secrets
+                      key: AWS_SECRET_ACCESS_KEY
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: aws-secrets
+                      key: AWS_ACCESS_KEY_ID
+                - name: SECRET_NAME
+                  value: {{ .Values.apricityAws.imagePullSecret }}
+              resources: { }
+              securityContext:
+                capabilities: { }
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: Default
+          hostNetwork: true
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: { }
+          terminationGracePeriodSeconds: 30
+  schedule: 0 */6 * * *
+  successfulJobsHistoryLimit: 3
+  suspend: false
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-aws-secrets
+spec:
+  template:
+    spec:
+      serviceAccountName: aws-serviceaccount
+      containers:
+        - name: aws-create-credentials
+          image: bitnami/kubectl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |-
+              kubectl create secret generic aws-secrets \
+              --from-literal=AWS_SECRET_ACCESS_KEY={{ .Values.apricityAws.configs.AWS_SECRET_ACCESS_KEY }} \
+              --from-literal=AWS_ACCESS_KEY_ID={{ .Values.apricityAws.configs.AWS_ACCESS_KEY_ID }}
+              echo "secret created successfuly"
+        - name: aws-create-token
+          image: odaniait/aws-kubectl:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |-
+              TOKEN=`aws ecr get-login-password`
+              kubectl delete secret --ignore-not-found $SECRET_NAME
+              kubectl create secret docker-registry $SECRET_NAME \
+              --docker-server=https://${ECR_REPOSITORY_URL} \
+              --docker-username=AWS \
+              --docker-password=${TOKEN}
+              kubectl patch serviceaccount default -p '{"imagePullSecrets":[{"name":"'$SECRET_NAME'"}]}'
+              echo "all done"
+          env:
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: aws-configmap
+                  key: AWS_DEFAULT_REGION
+            - name: ECR_REPOSITORY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: aws-configmap
+                  key: ECR_REPOSITORY_URL
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: AWS_ACCESS_KEY_ID
+            - name: SECRET_NAME
+              value: {{ .Values.apricityAws.imagePullSecret }}
+          resources: { }
+          securityContext:
+            capabilities: { }
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: Default
+      hostNetwork: true
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: { }
+      terminationGracePeriodSeconds: 30
+  backoffLimit: 4
+{{- end }}

@@ -14,19 +14,19 @@
 
 dependencies:
   - name: hlf-ca
-    repository: https://owkin.github.io/charts/
+    repository: https://apricity-dev.github.io/owkin-charts/
     version: 1.2.0
     condition: hlf-ca.enabled
   - name: hlf-ord
-    repository: https://owkin.github.io/charts/
+    repository: https://apricity-dev.github.io/owkin-charts/
     version: 2.0.0
     condition: hlf-ord.enabled
   - name: hlf-peer
-    repository: https://owkin.github.io/charts/
+    repository: https://apricity-dev.github.io/owkin-charts/
     version: 2.0.0
     condition: hlf-peer.enabled
   - name: hlf-couchdb
-    repository: https://owkin.github.io/charts/
+    repository: https://apricity-dev.github.io/owkin-charts/
     version: 1.0.7
     condition: hlf-peer.enabled
   - name: nginx-ingress

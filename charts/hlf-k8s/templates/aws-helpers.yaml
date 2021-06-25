@@ -1,0 +1,39 @@
+{{- if and .Values.apricityAws.enabled .Values.apricityAws.createSecret }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-configmap
+data:
+  AWS_DEFAULT_REGION: {{ .Values.apricityAws.configs.AWS_DEFAULT_REGION }}
+  ECR_REPOSITORY_URL: {{ .Values.apricityAws.configs.ECR_REPOSITORY_URL }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aws-serviceaccount
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: aws-authorization-role
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "secrets" ]
+    verbs: [ "create", "delete" ]
+  - apiGroups: [ "" ]
+    resources: [ "serviceaccounts" ]
+    verbs: [ "get", "patch" ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: role-aws-authorization-binding
+roleRef:
+  apiGroup: ""
+  kind: Role
+  name: aws-authorization-role
+subjects:
+  - kind: ServiceAccount
+    name: aws-serviceaccount
+    namespace: {{ .Release.Namespace }}
+{{- end }}
