@@ -72,7 +72,7 @@ chaincodes: []
 #   port: "7052"
 #   image:
 #     repository: 220471932914.dkr.ecr.eu-west-1.amazonaws.com/substra-chaincode
-#     tag: 0.1.1
+#     tag: 0.2.0
 #     pullPolicy: IfNotPresent
 
 
@@ -121,6 +121,7 @@ appChannels:
   # - name: mycc
   #   policy: "OR('MyOrg1MSP.member','MyOrg2MSP.member')"
   #   version: "1.0"
+  #   sequence: "1"
 
   ingress:
     enabled: false
@@ -184,9 +185,9 @@ hlf-ca:
       substra: [paris, nantes]
 
   persistence:
-    enabled: false
-    # size: 20Gi
-    # storageClass: ""4
+    enabled: true
+    size: 5Gi
+    # storageClass: ""
 
   orderer:
     scheme: http
@@ -194,10 +195,10 @@ hlf-ca:
     port: 7054
 
 hlf-peer:
-  docker:
-    enabled:
-      false
   peer:
+    docker:
+      enabled:
+        false
     databaseType: CouchDB
     couchdbInstance: cdb-peer
     gossip:
@@ -219,7 +220,8 @@ hlf-peer:
     repository: 220471932914.dkr.ecr.eu-west-1.amazonaws.com/fabric-peer
     tag: 0.0.16
   persistence:
-    enabled: false
+    enabled: true
+    size: 10Gi
   discover-monitor:
     enabled: false
   secrets:
@@ -259,6 +261,7 @@ hlf-couchdb:
     repository: hyperledger/fabric-couchdb
     tag: 0.4.21
   persistence:
+    enabled: true
     size: 10Gi
   couchdbUsername: couchdb
   couchdbPassword: couchdbpwd
@@ -273,7 +276,8 @@ hlf-ord:
   image:
     tag: 2.2.1
   persistence:
-    enabled: false
+    enabled: true
+    size: 10Gi
   ord:
     type: etcdraft
     mspID: MyOrdererMSP

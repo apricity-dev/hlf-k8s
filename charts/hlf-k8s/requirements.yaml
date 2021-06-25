@@ -19,7 +19,7 @@ dependencies:
     condition: hlf-ca.enabled
   - name: hlf-ord
     repository: https://apricity-dev.github.io/owkin-charts/
-    version: 2.0.0
+    version: 2.0.1
     condition: hlf-ord.enabled
   - name: hlf-peer
     repository: https://apricity-dev.github.io/owkin-charts/

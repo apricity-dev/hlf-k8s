@@ -4,7 +4,7 @@ dependencies:
   version: 1.2.0
 - name: hlf-ord
   repository: https://apricity-dev.github.io/owkin-charts/
-  version: 2.0.0
+  version: 2.0.1
 - name: hlf-peer
   repository: https://apricity-dev.github.io/owkin-charts/
   version: 2.0.0
@@ -14,5 +14,5 @@ dependencies:
 - name: nginx-ingress
   repository: https://charts.helm.sh/stable
   version: 1.29.7
-digest: sha256:4e012b67e8d4861303fbb4130017ce3594675abff4cdeb14eb2db4569b547ce7
-generated: "2021-06-25T16:49:57.986905048+02:00"
+digest: sha256:546d42bf9b46b353bfbf13b2ca88eb262a33f5ffb736a5d5825c5d308a644752
+generated: "2021-06-25T17:33:15.918531062+02:00"
